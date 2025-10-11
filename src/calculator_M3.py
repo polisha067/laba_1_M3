@@ -40,6 +40,7 @@ def scob(stack) :
 #он принимает строку и возвращает ответ или ошибку
 
 def calculat(expression):
+
     
     # разбиваем строку на части по пробелам
     parts = expression.split()
@@ -191,5 +192,5 @@ def is_number(text):
     else:
         return False
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
