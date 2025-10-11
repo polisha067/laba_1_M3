@@ -1,3 +1,5 @@
+from train import *
+
 def test_calculator():
    
     test_cases = [
@@ -19,5 +21,5 @@ def test_calculator():
         if result is not None:
             print(f"Ответ: {result}")
 
-if __name__ == "__main__":
+if __name__ == "__test__":
     test_calculator()

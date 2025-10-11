@@ -1,4 +1,7 @@
-def error_calculator():
+from train import *
+
+
+def error():
    
     error_cases = [
         "2 +",           
@@ -18,5 +21,5 @@ def error_calculator():
         if result is not None:
             print(f"Ответ: {result}")
 
-if __name__ == "__main__":
-    error_calculator()
+if __name__ == "__errorr__":
+    error()
