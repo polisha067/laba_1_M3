@@ -1,6 +1,19 @@
+
 from train import *
 
-def test_calculator():
+def train() -> None:
+    """
+    Обязательнная составляющая программ, которые сдаются. Является точкой входа в приложение
+    :return: Данная функция ничего не возвращает
+    """
+    
+
+
+
+
+
+
+
    
     test_cases = [
         "2 4 +",            #2+4 = 6
@@ -21,5 +34,9 @@ def test_calculator():
         if result is not None:
             print(f"Ответ: {result}")
 
-if __name__ == "__test__":
-    test_calculator()
+exp = input()
+print(calculat(exp))
+
+
+if __name__ == "__train__":
+    train()
