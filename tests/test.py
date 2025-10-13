@@ -1,4 +1,3 @@
-
 from train import *
 
 def train() -> None:
@@ -10,11 +9,6 @@ def train() -> None:
 
 
 
-
-
-
-
-   
     test_cases = [
         "2 4 +",            #2+4 = 6
         "5 5 *",            #5*5 = 25  
@@ -28,15 +22,13 @@ def train() -> None:
         "5 ~ 2 +"             # -5+2 = 3
     ]
     
-    for test in test_cases:
-        print(f"\n{test}")
-        result = calculat(test)
-        if result is not None:
-            print(f"Ответ: {result}")
+
 
 exp = input()
-print(calculat(exp))
+print((calculat(exp)))
 
 
 if __name__ == "__train__":
     train()
+
+# неправильно работает вывод( переделаю)
