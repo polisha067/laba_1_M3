@@ -192,5 +192,5 @@ def is_number(text):
     else:
         return False
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+     main()
