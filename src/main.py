@@ -1,5 +1,6 @@
-from calculator_M3 import calculat
-from calculator_M3 import main
+from calculator_M3 import *
+from clas import *
+
 
 def main() -> None:
     """
@@ -7,7 +8,10 @@ def main() -> None:
     :return: Данная функция ничего не возвращает
     """
     exp = input()
-    print(calculat(exp))
+    try:
+        print(calculat(exp))
+    except CaError as e:
+        print(f"Ошибка: {e.message}")
 
 
 if __name__ == "__main__":
