@@ -1,6 +1,6 @@
 import re 
 from clas import *
-from constanеs import *
+from const import *
 
 
 def main():
