@@ -1,196 +1,151 @@
 import re 
+from clas import *
+from constanеs import *
+
 
 def main():
     
-    
     while True:
-
         user_input = input("\nВвод: ").strip()
         
         # пустой ввод
         if not user_input:
-            print("нехватка данных")
+            print(f"Ошибка: {EMPTY}")
             continue
         
         # обрабатываем выражение
-        result = calculat(user_input)
-        
-        if result is not None:
+        try:
+            result = calculat(user_input)
             print(f"Ответ: {result}")
-        else:
-            print("Не выполнено")
+        except CaError as e:
+            print(f"Ошибка: {e.message}")
 
 
 # функция для скобок
-def scob(stack) :
-    
-    left = list(filter(lambda x: x == '(', stack))
-    right = list(filter(lambda x: x == ')', stack))
-    
-    if len(left) != len(right):
-        print(f"ошибка: - неподходящий ввод")
-        return None
-    else:
-        pass
-
-
-
-
-#сам калькулятор
-#он принимает строку и возвращает ответ или ошибку
-
-def calculat(expression):
-
-    
-    # разбиваем строку на части по пробелам
+def scob(expression):
     parts = expression.split()
+    left_count = 0
+    right_count = 0
     
+    for part in parts:
+        if part == OPEN_SKOB:
+            left_count += 1
+        elif part == CLOSE_SKOB:
+            right_count += 1
+            # проверяем, что закрывающая скобка не идет раньше открывающей
+            if right_count > left_count:
+                raise CaError(SKOB_ORDER)
+    
+    # проверяем равенство количества скобок
+    if left_count != right_count:
+        raise CaError(SKOB_COUNT.format(left=left_count, right=right_count))
 
+
+# сам калькулятор
+def calculat(expression):
+    # проверка скобок
+    scob(expression)
+    
+    tokens = expression.split()
     stack = []
-    
-    
     i = 0
     
-    # обработка
-    while i < len(parts):
-        part = parts[i]
+    while i < len(tokens):
+        token = tokens[i]
         
+        if is_number(token):
+            stack.append(float(token))
         
-        if is_number(part):
-       
-            num = float(part)
-            stack.append(num)
-        
-        
-        # обрвботка унарного минуса
-        elif part == "~":
-            if len(stack) < 1:
-                print("Ошибка: нет числа для унарным минусом")
-                return None
-           
+        elif token == UNARY_MINUS:
+            if len(stack) < MIN_STACK_SIZE_UNARY:
+                raise CaError(NO_NUMBER)
             num = stack.pop()
-            result = -num
-            stack.append(result)
-            print(f"унарный минус в выражении: ~{num} = {result}")
-
-       
-        # обработка, а точнее НЕобработка унарного плюса, пропуск его в выражении    
-        elif part == "^":
-            print(f"унарный плюс '^'")
+            stack.append(-num)
+        
+        elif token == UNARY_PLUS:
+            # Унарный плюс ничего не меняет
+            pass
+        
+        elif token in BINARY_OPERATORS:
+            if len(stack) < MIN_STACK_SIZE_BINARY:
+                raise CaError(NUMBERS)
             
+            num2 = stack.pop()
+            num1 = stack.pop()
             
-        elif part in ["+", "-", "*", "/", "**", "//", "%"]:
-            
-            
-            
-            if len(stack) < 2:
-                print("Нехватка чисел(мин 2 числа)")
-                return None
-            
-            
-            
-            # два последних числа из стека
-            num2 = stack.pop()  # сверху стека (последний)
-            num1 = stack.pop()  # следующий
-            
-            
-            
-            # основные операции
-            if part == "+":
+            if token == "+":
                 result = num1 + num2
-                
-            elif part == "-":
+            elif token == "-":
                 result = num1 - num2
-                
-            elif part == "*":
+            elif token == "*":
                 result = num1 * num2
-                
-            elif part == "/":
-                
+            elif token == "/":
                 if num2 == 0:
-                    print("На ноль не делим нникогда")
-                    return None
-                
+                    raise CaError(ZERO)
                 result = num1 / num2
-                
-            elif part == '**':
+            elif token == "**":
                 result = num1 ** num2
-
-            
-            elif part == "//":
-
+            elif token == "//":
                 if num2 == 0:
-                    print("На ноль не делим нникогда")
-                    return None
-                
+                    raise CaError(ZERO)
                 result = num1 // num2
-
-            elif part == "%":
-                
+            elif token == "%":
                 if num2 == 0:
-                    print("На ноль не делим нникогда")
-                    return None
-                
+                    raise CaError(ZERO)
                 result = num1 % num2
             
-
             stack.append(float(result))
-           
-        elif part == '(':
+        
+        elif token == OPEN_SKOB:
             
-            el_skobka = []
-            j = 1
-            k = 1 # вхождение в подстроку (
-            l = 0 # вхождение в подстроку )
+            balance = 1
+            j = i + 1
+            sub_tokens = []
             
-            while parts[i + j] != ')' and k != l:
-                el_skobka.append(parts[i + j])
+            while j < len(tokens) and balance > 0:
+                if tokens[j] == OPEN_SKOB:
+                    balance += 1
+                elif tokens[j] == CLOSE_SKOB:
+                    balance -= 1
+                
+                if balance > 0:  
+                    sub_tokens.append(tokens[j])
+                
                 j += 1
-                if parts[i + j] == ')':
-                    l += 1
-                elif parts[i + j] == '(':
-                    k += 1
             
-            if l == k:
-                stack.append(calculat(' '.join(el_skobka)))
-            else:
-                print(f"Ошибка: '{part}' - неподходящий ввод")
-                return None
-            i += j
+            if balance != 0:
+                raise CaError(SKOB_INPUT)
             
+            # рекурсивно вычисляем подвыражение в скобках
+            sub_expression = ' '.join(sub_tokens)
+            sub_result = calculat(sub_expression)
+            stack.append(sub_result)
+            
+            # переходим на позицию после закрывающей скобки
+            i = j - 1
+        
+        elif token == CLOSE_SKOB:
+            raise CaError(SKOB_ORDER)
+        
         else:
-            print(f"Ошибка: '{part}' - неподходящий ввод")
-            return None
+            raise CaError(INVALID.format(part=token))
         
         i += 1
     
-    
-    
-    if len(stack) == 1:
+    if len(stack) == EXPECTED_STACK_SIZE:
         return stack[0]
-    
     elif len(stack) == 0:
-        print("Ошибка: пустой стек")
-        return None
-    
+        raise CaError(STACK_EMPTY)
     else:
-        print(f"Ошибка: В стеке {len(stack)} числа")
-        return None
+        raise CaError(STACK_MANY.format(count=len(stack)))
 
 
 def is_number(text):
-    
-    #проверяет является ли текст числом
-    #возвращает True если число, False если нет
-    
-    
-    pattern = r'^[+-]?\d*\.?\d+$'
-    
-    
-    if re.match(pattern, text):
+    # проверяет является ли текст числом
+    if re.match(NUMBER_PATTERN, text):
         return True
     else:
         return False
 
 if __name__ == "__main__":
-     main()
+    main()
